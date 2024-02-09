@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from models import Todo
 
 app = FastAPI()
@@ -32,7 +32,7 @@ async def get_todos(todo: Todo):
 @app.put("/todos/{todo_id}")
 async def get_todos(todo_id: int, todo_update: Todo):
     if not any(todo.id == todo_id for todo in todos):
-        return { "message" : "Todo not found" }
+        raise HTTPException(status_code=404, detail="Item not found")
 
     for todo in todos:
         if todo.id == todo_id:
@@ -45,6 +45,9 @@ async def get_todos(todo_id: int, todo_update: Todo):
 # Delete a todo
 @app.delete("/todos/{todo_id}")
 async def delete_todo(todo_id: int):
+    if not any(todo.id == todo_id for todo in todos):
+        raise HTTPException(status_code=404, detail="Item not found")
+
     for todo in todos:
         if todo.id == todo_id:
             todos.remove(todo)
